@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent none
     stages {
         stage('Example Build') {
             steps {
@@ -8,8 +8,12 @@ pipeline {
         }
         stage('Example Deploy') {
             when {
+                beforeInput true
                 branch 'production'
-                environment name: 'DEPLOY_TO', value: 'production'
+            }
+            input {
+                message "Deploy to production?"
+                id "simple-input"
             }
             steps {
                 echo 'Deploying'
