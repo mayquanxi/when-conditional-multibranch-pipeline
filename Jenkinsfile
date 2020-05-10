@@ -22,7 +22,7 @@ pipeline {
                 }
                 stage('Branch B') {
                     agent {
-                        label "ubuntu18-digitalocean"
+                        label "master"
                     }
                     steps {
                         echo "On Branch B"
