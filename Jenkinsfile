@@ -7,10 +7,6 @@ pipeline {
             }
         }
         stage('Example Deploy') {
-            when {
-                beforeInput true
-                branch 'production'
-            }
             input {
                 message "Deploy to production?"
                 id "simple-input"
