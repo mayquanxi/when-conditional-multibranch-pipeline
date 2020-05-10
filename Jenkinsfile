@@ -1,47 +1,59 @@
 pipeline {
-    agent any
+    parameters {
+        choice(name: 'PLATFORM_FILTER', choices: ['all', 'master', 'ubuntu18-digitalocean'], description: 'Run on specific platform')
+    }
+    agent none
     stages {
-        stage('Non-Parallel Stage') {
-            steps {
-                echo 'This stage will be executed first.'
-            }
-        }
-        stage('Parallel Stage') {
-            when {
-                branch 'master'
-            }
-            failFast true
-            parallel {
-                stage('Branch A') {
-                    agent {
-                        label "ubuntu18-digitalocean"
+        stage('BuildAndTest') {
+            matrix {
+                agent {
+                    label "${PLATFORM}-agent"
+                }
+                when { anyOf {
+                    expression { params.PLATFORM_FILTER == 'all' }
+                    expression { params.PLATFORM_FILTER == env.PLATFORM }
+                } }
+                axes {
+                    axis {
+                        name 'PLATFORM'
+                        values 'master', 'ubuntu18-digitalocean'
                     }
-                    steps {
-                        echo "On Branch A"
+                    axis {
+                        name 'BROWSER'
+                        values 'firefox', 'chrome', 'safari', 'edge'
                     }
                 }
-                stage('Branch B') {
-                    agent {
-                        label "master"
-                    }
-                    steps {
-                        echo "On Branch B"
-                    }
-                }
-                stage('Branch C') {
-                    agent {
-                        label "ubuntu18-digitalocean"
-                    }
-                    stages {
-                        stage('Nested 1') {
-                            steps {
-                                echo "In stage Nested 1 within Branch C"
-                            }
+                excludes {
+                    exclude {
+                        axis {
+                            name 'PLATFORM'
+                            values 'master'
                         }
-                        stage('Nested 2') {
-                            steps {
-                                echo "In stage Nested 2 within Branch C"
-                            }
+                        axis {
+                            name 'BROWSER'
+                            values 'safari'
+                        }
+                    }
+                    exclude {
+                        axis {
+                            name 'PLATFORM'
+                            notValues 'ubuntu18-digitalocean'
+                        }
+                        axis {
+                            name 'BROWSER'
+                            values 'edge'
+                        }
+                    }
+                }
+                stages {
+                    stage('Build') {
+                        steps {
+                            echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                        }
+                    }
+                    stage('Test') {
+                        steps {
+                            echo "Do Test for ${PLATFORM} - ${BROWSER}"
                         }
                     }
                 }
