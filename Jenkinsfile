@@ -18,10 +18,6 @@ pipeline {
                         name 'PLATFORM'
                         values 'master', 'ubuntu18-digitalocean'
                     }
-                    axis {
-                        name 'BROWSER'
-                        values 'firefox', 'chrome', 'safari', 'edge'
-                    }
                 }
                 excludes {
                     exclude {
@@ -29,31 +25,23 @@ pipeline {
                             name 'PLATFORM'
                             values 'master'
                         }
-                        axis {
-                            name 'BROWSER'
-                            values 'safari'
-                        }
                     }
                     exclude {
                         axis {
                             name 'PLATFORM'
                             notValues 'ubuntu18-digitalocean'
                         }
-                        axis {
-                            name 'BROWSER'
-                            values 'edge'
-                        }
                     }
                 }
                 stages {
                     stage('Build') {
                         steps {
-                            echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                            echo "Do Build for ${PLATFORM}"
                         }
                     }
                     stage('Test') {
                         steps {
-                            echo "Do Test for ${PLATFORM} - ${BROWSER}"
+                            echo "Do Test for ${PLATFORM}"
                         }
                     }
                 }
